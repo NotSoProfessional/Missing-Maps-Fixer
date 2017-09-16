@@ -74,6 +74,7 @@ namespace Missing_Maps_Fixer
             foreach (string host in hostList)
             {
                 System.Threading.Thread.Sleep(800);
+
                 if (client.IsBusy == false && _main.labelInfo.Text == "Finding server...")
                 {
                     
@@ -94,10 +95,7 @@ namespace Missing_Maps_Fixer
                 {
                    break;
                 }
-
-                
-            }
-            
+            }  
         }
 
 
@@ -135,7 +133,6 @@ namespace Missing_Maps_Fixer
                     timeRemaining = string.Format("{0:D2}m:{1:D2}s remaining...",
                         time.Minutes,
                         time.Seconds);
-
                 }
 
             }

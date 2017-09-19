@@ -20,7 +20,6 @@ namespace Missing_Maps_Fixer
         private static BackgroundWorker backWorkerTimer = new BackgroundWorker();
 
         private static Boolean done;
-        private static Boolean updateNeeded;
         private static fileExtract _fExtract;
         private static MainForm _main;
         private static long oldRecieved;
@@ -106,7 +105,6 @@ namespace Missing_Maps_Fixer
            
             currentRecieved = e.BytesReceived;
                 totalRecieved = e.TotalBytesToReceive;
-           
         }
 
 
@@ -127,29 +125,36 @@ namespace Missing_Maps_Fixer
 
                     differenceRecieved = currentRecieved - oldRecieved;
                     currentRemaining = totalRecieved - currentRecieved;
-                    secondsRemaining = currentRemaining / differenceRecieved;
+                    try
+                    {
+                        secondsRemaining = currentRemaining / differenceRecieved;
+                        TimeSpan time = TimeSpan.FromSeconds(secondsRemaining);
+                        timeRemaining = string.Format("{0:D2}m:{1:D2}s remaining...",
+                            time.Minutes,
+                            time.Seconds);
+                    }
 
-                    TimeSpan time = TimeSpan.FromSeconds(secondsRemaining);
-                    timeRemaining = string.Format("{0:D2}m:{1:D2}s remaining...",
-                        time.Minutes,
-                        time.Seconds);
+                    catch (Exception exception)
+
+                    {
+
+                    }
                 }
-
             }
-
         }
             
     
         private void download_Completed(object sender, AsyncCompletedEventArgs e)
         {
+
             try
             {
 
                 if (backWorkerMap.IsBusy == false && e.Error.Message != null)
                 {
+                    done = true;
                     _main.labelInfo_Change("Unable to find map!");
                     _main.finished(false);
-                    done = true;
                 }
             }
 
@@ -157,6 +162,9 @@ namespace Missing_Maps_Fixer
 
             {
                 done = true;
+
+                _main.pBarMain_Change(100);
+
                 backWorkerMap.CancelAsync();
 
                 _fExtract = new fileExtract(_main, this);

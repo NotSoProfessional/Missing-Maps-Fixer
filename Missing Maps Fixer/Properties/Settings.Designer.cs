@@ -25,7 +25,7 @@ namespace Missing_Maps_Fixer.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("C:\\Program Files (x86)\\Steam\\steamapps\\common")]
+        [global::System.Configuration.DefaultSettingValueAttribute("C:\\Program Files (x86)\\Steam\\steamapps\\commonasdasdasdasdasdasdasdasd")]
         public string steamPath {
             get {
                 return ((string)(this["steamPath"]));

@@ -1,11 +1,7 @@
 ﻿using System;
 using System.Net;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.IO;
-using System.IO.Compression;
 using System.ComponentModel;
 using System.Windows.Forms;
 
@@ -26,14 +22,8 @@ namespace Missing_Maps_Fixer
         private static long currentRecieved;
         private static long totalRecieved;
         private static string timeRemaining;
+        private static string fileType;
         public static string mapName;
-
-        private string[] hostList = {"http://files.gamebanana.com/maps/",
-            "http://fastdl.gflclan.com/garrysmod/maps/",
-            "http://fastdl.gflclan.com/csgo/maps/",
-            "http://dl.openfastdl.net/tf/maps/",
-            "http://fakkelbrigade.eu/maps/",
-            "http://ouroborosgaming.net/garrysmod/maps/"};
 
         public fileDownload(MainForm main, fileExtract fe)
         {
@@ -70,29 +60,54 @@ namespace Missing_Maps_Fixer
         {
             _main.labelInfo_Change("Finding server...");
 
-            foreach (string host in hostList)
+            var hostDict = new Dictionary<string, string[]>();
+            hostDict.Add("http://files.gamebanana.com/maps/", new string[] { ".rar", ".zip", ".7z"});
+            hostDict.Add("https://files.gamebanana.com/maps/", new string[] { ".zip"});
+            hostDict.Add("http://fastdl.gflclan.com/garrysmod/maps/", new string[] { ".bsp.bz2" });
+            hostDict.Add("http://fastdl.gflclan.com/csgo/maps/", new string[] { ".bsp.bz2" });
+            hostDict.Add("http://dl.openfastdl.net/tf/maps/", new string[] { ".bsp.bz2" });
+            hostDict.Add("http://fakkelbrigade.eu/maps/", new string[] { ".bsp.bz2" });
+            hostDict.Add("http://ouroborosgaming.net/garrysmod/maps/", new string[] { ".bsp.bz2" });
+
+            foreach (string host in hostDict.Keys)
             {
-                System.Threading.Thread.Sleep(800);
-
+                string[] types;
+                types = hostDict[host];
+                System.Threading.Thread.Sleep(1100);
                 if (client.IsBusy == false && _main.labelInfo.Text == "Finding server...")
-                {
-                    
-                    try
+                  { 
+                foreach (string type in types)
                     {
-                        client.DownloadFileAsync(new System.Uri(host + mapName + ".bsp"), "C:\\Users\\Public\\Documents\\" + mapName + ".bsp");
-                    }
 
-                    catch (Exception exception)
+                        if (client.IsBusy == false && _main.labelInfo.Text == "Finding server...")
+                        {
 
-                    {
-                        MessageBox.Show(exception.Message);
+                            try
+                            {
+                                client.DownloadFileAsync(new System.Uri(host + mapName + type), Path.GetTempPath() + mapName + type);
+
+                                fileType = type;
+                            }
+
+                            catch (Exception exception)
+
+                            {
+                                MessageBox.Show(exception.Message);
+                            }
+                        }
+
+                        else
+
+                        {
+                            break;
+                        }
                     }
                 }
 
                 else
 
-                {
-                   break;
+                { 
+                    break;
                 }
             }  
         }
@@ -100,9 +115,10 @@ namespace Missing_Maps_Fixer
 
         private void download_ProgressChanged(object sender, DownloadProgressChangedEventArgs e)
         {
+            
             _main.labelInfo_Change("Downloading map \"" + mapName + "\" - " + e.ProgressPercentage.ToString() + "% " + timeRemaining);
             _main.pBarMain_Change(e.ProgressPercentage);
-           
+
             currentRecieved = e.BytesReceived;
                 totalRecieved = e.TotalBytesToReceive;
         }
@@ -121,7 +137,7 @@ namespace Missing_Maps_Fixer
                 {
                     oldRecieved = currentRecieved;
 
-                    System.Threading.Thread.Sleep(1000);
+                   System.Threading.Thread.Sleep(1000);
 
                     differenceRecieved = currentRecieved - oldRecieved;
                     currentRemaining = totalRecieved - currentRecieved;
@@ -137,7 +153,7 @@ namespace Missing_Maps_Fixer
                     catch (Exception exception)
 
                     {
-
+                        
                     }
                 }
             }
@@ -168,7 +184,7 @@ namespace Missing_Maps_Fixer
                 backWorkerMap.CancelAsync();
 
                 _fExtract = new fileExtract(_main, this);
-                _fExtract.map(mapName);
+                _fExtract.map(mapName, fileType);
             }
         }     
     }
